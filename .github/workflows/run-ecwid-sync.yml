@@ -24,8 +24,8 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Write Google service account JSON to file
-        # This writes the secret (the entire JSON) to service_account.json
-        run: printf '%s' "${{ secrets.GOOGLE_SHEETS_SERVICE_ACCOUNT }}" > service_account.json
+        run: |
+          echo '${{ secrets.GOOGLE_SHEETS_SERVICE_ACCOUNT }}' > service_account.json
 
       - name: Run ecwid_sync script
         env:
