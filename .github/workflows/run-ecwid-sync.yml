@@ -1,0 +1,46 @@
+name: Run Ecwid Sync
+
+on:
+  # run every hour, on the hour (cron uses UTC)
+  schedule:
+    - cron: '0 * * * *'
+  # allow manual trigger from Actions UI
+  workflow_dispatch:
+
+jobs:
+  run-ecwid-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Write Google service account JSON to file
+        # This writes the secret (the entire JSON) to service_account.json
+        run: printf '%s' "${{ secrets.GOOGLE_SHEETS_SERVICE_ACCOUNT }}" > service_account.json
+
+      - name: Run ecwid_sync script
+        env:
+          # Ecwid credentials
+          ECWID_STORE_ID: ${{ secrets.ECWID_STORE_ID }}
+          ECWID_SECRET_TOKEN: ${{ secrets.ECWID_SECRET_TOKEN }}
+
+          # Tell your script where the JSON file is
+          GOOGLE_SHEETS_SERVICE_ACCOUNT_FILE: service_account.json
+
+          # Optional environment values (set them as secrets too if you want different names)
+          NEW_SHEET_NAME: ${{ secrets.NEW_SHEET_NAME }}
+          GOOGLE_ORDERS_WORKSHEET_NAME: ${{ secrets.GOOGLE_ORDERS_WORKSHEET_NAME }}
+          GOOGLE_LOG_WORKSHEET_NAME: ${{ secrets.GOOGLE_LOG_WORKSHEET_NAME }}
+          INITIAL_FETCH_DATE_STR: ${{ secrets.INITIAL_FETCH_DATE_STR }}
+
+        run: |
+          python ecwid_sync.py
