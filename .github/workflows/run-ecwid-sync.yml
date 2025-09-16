@@ -25,7 +25,9 @@ jobs:
 
       - name: Write Google service account JSON to file
         run: |
-          echo '${{ secrets.GOOGLE_SHEETS_SERVICE_ACCOUNT }}' > service_account.json
+          cat > service_account.json <<'EOF'
+          ${{ secrets.GOOGLE_SHEETS_SERVICE_ACCOUNT }}
+          EOF
 
       - name: Run ecwid_sync script
         env:
