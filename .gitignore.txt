@@ -1,0 +1,7 @@
+# Secrets and env
+service_account.json
+.env
+
+# Python
+__pycache__/
+*.pyc
